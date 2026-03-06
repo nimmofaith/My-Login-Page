@@ -1,28 +1,25 @@
+import os
 from flask import Flask, jsonify
 from flask_cors import CORS
 from db import db
-import os
-
 
 def create_app():
-    app = Flask(__name__, )
+    app = Flask(__name__)
 
-    # Configuration
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + \
-        os.path.join(app.instance_path, 'login_system.db')
+    # Use /tmp for SQLite on Render
+    db_path = os.path.join('/tmp', 'login_system.db')
+    app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{db_path}'
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-    # Use environment variable for production
-    app.config['SECRET_KEY'] = os.environ.get(
-        'SECRET_KEY', 'your_secret_key_here')
+
+    # Secret key from environment variable
+    app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'your_secret_key_here')
 
     # Initialize extensions
     db.init_app(app)
     CORS(app)
 
-    # Import models to ensure they're registered
+    # Import models and blueprints
     from models import User
-
-    # Register blueprints
     from routes import auth_bp
     app.register_blueprint(auth_bp)
 
@@ -37,7 +34,8 @@ def create_app():
 
     return app
 
+app = create_app()
 
-if __name__ == '__main__':
-    port = int(os.environ.get("PORT", 5000))  # use Render's assigned port
-    app.run(host="0.0.0.0", port=port, debug=False)  # debug=False for production
+if __name__ == "__main__":
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port, debug=False)
