@@ -6,7 +6,7 @@ export default function Login() {
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    const res = await fetch('https://my-login-page-cemv.onrender.com/login', {
+    const res = await fetch('https://my-login-page-cemv.onrender.com/', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ username, password })
